@@ -35,8 +35,15 @@
     }
     // Final do código do stackoverflow
     
-    function validar_senha($user, $senha){
-        return true;
+    function validar_senha($id_usuario, $senha){
+        $conexao = conectar_bd();
+        $comando = "SELECT * from Usuario WHERE idUsuario = '" + $id_usuario + "';";
+        $resultado_query = mysqli_query($conexao, $comando) or header("Location: login.php");
+        if (mysqli_num_rows($resultado_query) >= 1) {
+            $usuario = mysqli_fetch_assoc($resultado_query);
+            return openssl_pbkdf2($senha, $usuario["Salt"], 32, 600000, 'SHA256') == $usuario["Senha_hash"];
+        }
+        return false;
     } 
 
     function guardar_senha($user, $senha) {
