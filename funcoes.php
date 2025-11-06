@@ -1,5 +1,5 @@
 <?php
-    fuction conectar_bd(){
+    function conectar_bd(){
         $nome_servidor = "127.0.0.1";
         $nome_user = "root";
         $senha = "";
@@ -15,8 +15,8 @@
         $cookie = $user . ':' . $token;
         $mac = hash_hmac('sha256', $cookie, SECRET_KEY);
         $cookie .= ':' . $mac;
-        $longevidade = time()+60*60*24*30
-        if (!$lembrar) {$longevidade = 0}
+        $longevidade = time()+60*60*24*30;
+        if (!$lembrar) {$longevidade = 0;}
         setcookie('rememberme', $cookie);
     }
 
