@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+
+    <title>Pagina de Login</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link href='https://cdn.boxicons.com/3.0.4/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body>
 
     <?php
@@ -16,27 +21,39 @@
         }
     ?>
 
-    <form method="POST" action="/backend/logar.php" class="form">
-
-        <div class = "login">
-
+    <div class = "wrapper">
+        <form method="POST" action="/backend/logar.php" class="form">
+            
             <h1>Login</h1>
 
-            <div class = "grupo-email">
-                <input required type="email" name = "email">
-                <label for="email">Email</label>
-                <br><br>
+            <div class = "input-box">
+                <div class="efeito">
+                    <input required type="email" name = "email">
+                    <label for="email">Email</label>
+                    <br><br>
+                </div>
             </div>
 
-            <div class = "grupo-senha">
-                <input required type = "password" name = "senha">
+            <div class = "input-box">
+                <div class="efeito">
+                    <input required type = "password" name = "senha">
                 <label for="senha">Senha</label><br><br>
+                </div>   
             </div>
-        </div>
-        
-        <button name="botao" type="submit" value="logar" class="button"><strong>Logar</strong></button>
-        <a href="cadastro.php" class="link"><strong>cadastro</strong></a>
-    </form>
-    
+
+            <div class = "lembrar-senha">
+                <label><input type="checkbox">Lembrar de mim</label>
+                <a href="#">Esqueceu a senha?</a>
+            </div>
+
+            <button name="botao" type="submit" value="logar" class="button"><strong>Logar</strong></button>
+
+            <div class = "cadastro-link">
+                <p>Não possui uma conta?
+                <a href="cadastro.php" class="link"><strong>Cadastrar</strong></a>
+                </p>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

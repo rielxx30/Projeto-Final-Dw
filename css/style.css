@@ -1,111 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
 }
 
-body {
-    /*configuração da fonte*/
-    font-family: "Roboto", sans-serif;
+body{
 
-    /*configuração da pagina*/
+    /*config dos elementos*/
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100%;
+    min-height: 300hv;
 
-    /*configurações do background*/
-    background-color: #f2e8cf;
+    /*config do background*/
+    background: url('img_background.jpg') no-repeat;
     background-size: cover;
     background-position: center;
 }
 
-.form {
-    /*configuração do form*/
-    background-color: #a7c957;
-    backdrop-filter: blur(7px);
-    box-shadow: 0 8 32px rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
+.wrapper{
+    width: 420px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    color: #fff;
+    backdrop-filter: blur(40px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    border-radius: 10px;
+    padding: 30px 40px;
+}
 
-    padding: 30px 35px;
-    
-    width: 300px;
-    height: 360px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+.wrapper h1{
+    font-size: 36px;
     text-align: center;
 }
 
-.form h1 {
-    margin-bottom: 25px;
-    color: #386641;
-    /*mudar a fonte*/
-}
-
-.grupo-email,
-.grupo-senha{
+.wrapper .input-box{
     position: relative;
+    width: 100%;
+    height: 50px;
+    margin: 30px 0;
 }
 
-label{
+.efeito label{
     color: #F2E8CF;
     padding: 0 5px;
     position: absolute;
     transform: translateY(-50%);
-    top: 40%;
-    left: 1em;
+    top: 60%;
+    left: 1.5em;
     pointer-events: none;
     transition: .3s;
     font-weight: bold;
 }
 
-input{
+.efeito input{
     color: white;
-    border: 2px solid var(#386641);
+    border: 2px solid rgba(56, 102, 65, .3);
     background: transparent;
-    border-radius: 5px;
-    width: 250px;
+    border-radius: 40px;
+    width: 100%;
     height: 60px;
     padding: 0 1rem;
     outline: none;
+    font-size: 16px;
+    padding: 20px 45px 20px 20px;
 }
 
-input:focus~label,
+.efeito input:focus~label,
 input:valid~label{
     top: 0;
-    background-color: #a7c957;
+    background: transparent;
+    backdrop-filter: blur(40px);
     font-size: 0.8rem;
     font-weight: bold;
 }
 
-.button {
-    width: 105%;
-    background-color: #386641;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    cursor: pointer;
-    margin-top: 10px;
+.wrapper .lembrar-senha{
+    display: flex;
+    justify-content: space-between;
+    font-size: 14.5px;
+    margin: -10px 0 15px;
 }
 
-.button:hover {
-    background-color: #6A994E;
+.lembrar-senha label input{
+    accent-color: #fff;
+    margin-right: 3px;
 }
 
-.link {
-    display: block;
-    margin-top: 15px;
+.lembrar-senha a{
+    color: #fff;
     text-decoration: none;
-    color: #386641;
-    font-size: 14px;
 }
-
-.link:hover {
+.lembrar-senha a:hover{
     text-decoration: underline;
 }
+
+.wrapper .button{
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
+
+.wrapper .cadastro-link{
+    font-size: 14.5px;
+    text-align: center;
+    margin: 20px 0 15px;
+}
+
+.cadastro-link p a{
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.cadastro-link p a:hover{
+    text-decoration: underline;
+}
+
+
