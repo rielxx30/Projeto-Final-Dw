@@ -82,8 +82,16 @@
         $comando="USE " . $nome_bd;
         $resultado_query = mysqli_query($conexao, $comando);
 
-        $comando = "CREATE TABLE Usuario ( 
+        $comando = "CREATE TABLE TiposUsuario ( 
+                        idTiposUsuario INT PRIMARY KEY,  
+                        Nome VARCHAR(255),  
+                    ); 
+
+                    CREATE TABLE Usuario ( 
                         idUsuario INT PRIMARY KEY AUTO_INCREMENT,  
+                        idTiposUsuario INT PRIMARY KEY,  
+                        FOREIGN KEY(idTiposUsuario) REFERENCES TiposUsuario (idTiposUsuario)
+
                         Nome VARCHAR(255) NOT NULL,  
                         Salt INT NOT NULL,  
                         Senha_hash INT NOT NULL,  
