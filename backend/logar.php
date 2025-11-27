@@ -5,6 +5,7 @@
         try {
             $email = htmlspecialchars($_POST["email"]);
             $senha = htmlspecialchars($_POST["senha"]);
+            $lembrar = isset($_POST['lembrar']);
         } catch (Exception $e) {
             error_log('Erro no request, usuario e/ou senha não estão presentes');
             header('../paginas/login.php');
@@ -25,7 +26,7 @@
 
         $usuario_salvo = mysqli_fetch_assoc($resultado_query);
         if (validar_senha($usuario_salvo["idUsuario"], $senha)){
-            $_SESSION['usuario'] = $usuario_salvo["nome"];
+            gerar_token_login($usuario_salvo["idUsuario"], $lembrar);
             header("Location: /");
             exit();
         }

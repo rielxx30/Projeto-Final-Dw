@@ -44,8 +44,8 @@
             </div>
 
             <div class = "lembrar-senha">
-                <label><input type="checkbox">Lembrar de mim</label>
-                <a href="#">Esqueceu a senha?</a>
+                <label><input type="checkbox" name="lembrar" value="true">Lembrar de mim</label>
+                <!-- <a href="#">Esqueceu a senha?</a> -->
             </div>
 
             <button name="botao" type="submit" value="entrar" class="button"><strong>Entrar</strong></button>

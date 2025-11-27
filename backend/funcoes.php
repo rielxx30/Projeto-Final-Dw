@@ -2,7 +2,7 @@
     function conectar_bd(){
         $nome_servidor = "127.0.0.1";
         $nome_user = "root";
-        $senha = "";
+        $senha = "toor";
         $nome_bd = "RedeSocial";
 
         $conexao = mysqli_connect($nome_servidor, $nome_user, $senha);
@@ -10,37 +10,60 @@
         return $conexao;
     }
 
-    // Código original de https://stackoverflow.com/questions/1354999/keep-me-logged-in-the-best-approach
-    function onLogin($user, $lembrar) {
-        $token = random_bytes(32); // generate a token, should be 128 - 256 bit
-        storeTokenForUser($user, $token);
-        $cookie = $user . ':' . $token;
-        $mac = hash_hmac('sha256', $cookie, SECRET_KEY);
-        $cookie .= ':' . $mac;
-        $longevidade = time()+60*60*24*30;
-        if (!$lembrar) {$longevidade = 0;}
-        setcookie('rememberme', $cookie);
+    function gerar_token_login($id_usuario, $lembrar) {
+        $token = random_bytes(32);
+        $salt = random_bytes(32);
+        $token_hash = openssl_pbkdf2($token, $salt, 32, 600000, 'SHA256');
+        // Por padrão vale por 30 dias após gerado
+        $validade = time()+60*60*24*30;
+        if (!$lembrar) {$validade = time();}
+        
+        $conexao = conectar_bd();
+        $comando = "INSERT INTO TokensUsuario (idUsuario, IpCliente, DataEmissao, Salt, Token_hash, Validade)  
+                        VALUES ('" . $id_usuario . "', '" . $_SERVER['REMOTE_ADDR'] . "', '" . date('Y-m-d') . "', '" . mysqli_real_escape_string($conexao, $salt) . "', '" . mysqli_real_escape_string($conexao, $token_hash) . "', '" . date('Y-m-d', $validade) . "')";
+        $resultado_query = mysqli_query($conexao, $comando);
+        
+        $cookie = $id_usuario . ':' . $token;
+        if (!$lembrar) {$validade = 0;}
+        setcookie('rememberme', $cookie, time()+60*60*24*7, "/");
+        echo $cookie;
     }
 
-    function rememberMe() {
+    function checar_login() {
+        // Retorna o id ligado ao usuário
+        // Retorna -1 se não tem o cookie com o token
+        // Retorna -2 se não tem tokens para esse idUsuario
+        // Retorna 0 se não o token não corresponde a nenhum token salvo 
         $cookie = isset($_COOKIE['rememberme']) ? $_COOKIE['rememberme'] : '';
-        if ($cookie) {
-            list ($user, $token, $mac) = explode(':', $cookie);
-            if (!hash_equals(hash_hmac('sha256', $user . ':' . $token, SECRET_KEY), $mac)) {
-                return false;
-            }
-            $usertoken = fetchTokenByUserName($user);
-            if (hash_equals($usertoken, $token)) {
-                logUserIn($user);
-            }
+        if (!$cookie) {return -2;}
+        
+        list ($id_usuario, $token) = explode(':', $cookie);
+        
+        // Puxa os tokens do usuário, se não encontrar nenhum, retorna falso
+        $conexao = conectar_bd();
+        $comando = "SELECT IpCliente, DATEDIFF(Validade, '" . date('Y-m-d') . "') as DiasAteVencimento, DATEDIFF(Validade, DataEmissao) as TemVencimento, Salt, Token_hash from TokensUsuario WHERE idUsuario = '" . $id_usuario . "';";
+        $resultado_query = mysqli_query($conexao, $comando);
+        // Checa se há tokens
+        if (mysqli_num_rows($resultado_query) === 0) {return -1;}
+        
+        while ($obj_token = mysqli_fetch_assoc($resultado_query)) {
+            // Se o token não tem mais dias até o vencimento, pula o token
+            // TODO Remover do banco de dados os tokens que já venceram
+            if ($obj_token["DiasAteVencimento"] < 0 and $obj_token["TemVencimento"] !== 0) {continue;}
+            // Se o ip da máquina não bate com o ip do token, pula esse token
+            if ($obj_token["IpCliente"] !== $_SERVER['REMOTE_ADDR']) {continue;}
+            // Checa se os tokens batem
+            $token_hash = openssl_pbkdf2($token, $obj_token["Salt"], 32, 600000, 'SHA256');
+            if ($token_hash === $obj_token["Token_hash"]) {return $id_usuario;}
         }
+        // Se nenhum token válido foi encontrado, retorna falso
+        return 0;
     }
-    // Final do código do stackoverflow
     
     function validar_senha($id_usuario, $senha){
         $conexao = conectar_bd();
-        $comando = "SELECT * from Usuario WHERE idUsuario = '" + $id_usuario + "';";
-        $resultado_query = mysqli_query($conexao, $comando) or header("Location: login.php");
+        $comando = "SELECT * from Usuario WHERE idUsuario = '" . $id_usuario . "';";
+        $resultado_query = mysqli_query($conexao, $comando);
         if (mysqli_num_rows($resultado_query) >= 1) {
             $usuario = mysqli_fetch_assoc($resultado_query);
             return openssl_pbkdf2($senha, $usuario["Salt"], 32, 600000, 'SHA256') == $usuario["Senha_hash"];
@@ -52,10 +75,10 @@
         $salt = random_bytes(32);
         $criptografada = openssl_pbkdf2($senha, $salt, 32, 600000, 'SHA256');
         $conexao = conectar_bd();
-        $comando = "UPDATE Usuario SET Senha_hash = '" + $criptografada + "', Salt= '" + $salt + "' WHERE idUsuario = '" + $user + "';";
+        $comando = "UPDATE Usuario SET Senha_hash = '" . $criptografada . "', Salt= '" . $salt . "' WHERE idUsuario = '" . $user . "';";
         $resultado_query = mysqli_query($conexao, $comando);
         if (!$resultado_query) {
-            error_log('Erro ao tentar salvar senha do usuário ' + $user + ': ' + mysqli_error($conexao));
+            error_log('Erro ao tentar salvar senha do usuário ' . $user . ': ' . mysqli_error($conexao));
             return false;
         }
         return true;
@@ -67,11 +90,25 @@
 
         }
     }
+
+    function idUsuario_para_idCanal($id_usuario) {
+        // Se nenhum token válido foi encontrado, retorna 0
+        $conexao = conectar_bd();
+        $comando = "SELECT idCanal FROM Canal WHERE idUsuario = '" . $id_usuario . "';";
+        $resultado_query = mysqli_query($conexao, $comando);
+        if (mysqli_num_rows($resultado_query) === 0) {return 0;}
+        
+        while ($canal = mysqli_fetch_assoc($resultado_query)) {
+            return $canal["idCanal"];
+        }
+        return 0;
+    }
+    
     
     function criar_banco() {
         $nome_servidor = "127.0.0.1";
         $nome_user = "root";
-        $senha = "";
+        $senha = "toor";
         $nome_bd = "RedeSocial";        
         
         $conexao = mysqli_connect($nome_servidor, $nome_user, $senha);
